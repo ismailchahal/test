@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      function sendRequest() {
+        
+        var email = document.getElementById("email").value;
+        var passwordd = document.getElementById("password").value;
+        var apiKeyy = document.getElementById("apiKey").value;
+        var timestampe = Date.now().toString();
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "https://zsapi.zscaler.net/api/v1/authenticatedSession", true);
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.send({
+            username: email,
+            password: passwordd,
+            timestampe: timestampe,
+            apiKey: obfuscateApiKey(timestampe, apiKeyy)
+        });
+
+    }
+
+    function obfuscateApiKey(timestamp, key) {
+        var high = timestamp.substring(timestamp.length - 6);
+        var low = (parseInt(high) >> 1).toString();
+        var apiKey = "";
+        while (low.length < 6) {
+            low = "0" + low;
+        }
+        for (var i = 0; i < high.length; i++) {
+            apiKey += key.charAt(parseInt(high.charAt(i)));
+        }
+        for (var j = 0; j < low.length; j++) {
+            apiKey += key.charAt(parseInt(low.charAt(j)) + 2);
+        }
+        return apiKey;
+    }
+    </script>
+  </head>
+  <body>
+    <form>
+      Email: <input type="email" id="email" value="" required><br><br>
+      Password: <input type="password" id="password" required><br><br>
+      API Key: <input type="text" id="apiKey" value="" required><br><br>
+      <input type="button" value="Submit" onclick="sendRequest()">
+    </form>
+  </body>
+</html>
